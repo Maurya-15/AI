@@ -1,0 +1,70 @@
+services:
+  # Web API Service
+  - type: web
+    name: devsync-sales-api
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: devsync-sales-db
+          property: connectionString
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_FROM_NAME
+        value: DevSync Innovation
+      - key: BUSINESS_ADDRESS
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: ABSTRACTAPI_KEY
+        sync: false
+      - key: NUMVERIFY_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DRY_RUN_MODE
+        value: true
+      - key: APPROVAL_MODE
+        value: true
+      - key: DAILY_EMAIL_CAP
+        value: 100
+      - key: DAILY_CALL_CAP
+        value: 100
+      - key: TIMEZONE
+        value: Asia/Kolkata
+    
+  # Background Worker for Scheduler
+  - type: worker
+    name: devsync-sales-scheduler
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m app.scheduler
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: devsync-sales-db
+          property: connectionString
+      - key: EMAIL_FROM
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DRY_RUN_MODE
+        value: true
+      - key: DAILY_EMAIL_CAP
+        value: 100
+
+databases:
+  - name: devsync-sales-db
+    databaseName: devsync_sales
+    user: devsync_user
+    plan: starter
