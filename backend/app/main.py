@@ -208,6 +208,10 @@ app.include_router(api_router)
 from app.api.campaigns import router as campaigns_router
 app.include_router(campaigns_router, prefix="/api/v1")
 
+# Include admin router
+from app.api.admin import router as admin_router
+app.include_router(admin_router, prefix="/api/v1")
+
 # Start scheduler
 from app.scheduler import get_scheduler
 
